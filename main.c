@@ -146,7 +146,30 @@ void applicationLoop(Application *app, HAL *hal)
         handleGame(app, hal);
         break;
     }
+    case Scores:
+    {
+        handleScores();
+        break;
     }
+
+    }
+}
+
+void handleScores(Application *app, HAL *hal)
+{
+    if (app->printScreen)
+     {
+         app->printScreen = false;
+         drawTitle();
+     }
+
+     if (BB1tapped())
+     {
+         app->printScreen = true;
+         app->state = Title;
+         *(app) = *(applicationConstruct());
+     }
+
 }
 
 void handleTitle(Application *app, HAL *hal)
