@@ -6,11 +6,19 @@
 
 #include "Application.h"
 
+
 /* Graphic library context */
 Graphics_Context g_sContext;
 
 /* ADC results buffer */
 static uint16_t resultsBuffer[3];
+
+/* Enum to represent tilt state */
+enum accel_state {UP, NORMAL, DOWN};
+static enum accel_state my_state = NORMAL;
+
+/* Words to display */
+char* words[30] = {"elephant", "airplane", "guitar","Swimming","Balloon","Whisper","Robot","Spider","Dancing","Pirate","Fireworks","Chef","Lion","Sleeping","Rainbow","Doctor","Superhero","Fishing","Laughing","Astronaut","Washing Machine","Dinosaur","Painting","Surfing","Clapping","Ghost","Bowling","Magician","Juggling","Campfire"};
 static int word_index = 0;
 
 /* Score variable */
@@ -274,9 +282,9 @@ void displayTimeRemaining()
                                 64, 110, OPAQUE_TEXT);
 }
 
-void next_word()
-{
-    word_index = (word_index + 1) % 3;
+
+void next_word() {
+    word_index = rand()%30;
     reset_timer();  // Reset the timer when the word changes
 }
 int get_remaining_time()
