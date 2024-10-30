@@ -132,6 +132,11 @@ void next_word() {
     word_index = (word_index + 1) % 3;
     reset_timer();  // Reset the timer when the word changes
 }
+int get_remaining_time(){
+    int time = MAP_Timer32_getValue(TIMER32_0_BASE);
+    int time_remaining = time/48000000;
+    return time_remaining;
+}
 
 void reset_timer() {
     MAP_Timer32_haltTimer(TIMER32_0_BASE);  // Stop the timer
@@ -144,9 +149,17 @@ void drawAccelData() {
     switch (my_state) {
         case NORMAL:
             MAP_Timer32_startTimer(TIMER32_0_BASE, false);
+            if(get_remaining_time() == 0){
+                Graphics_clearDisplay(&g_sContext);
+                next_word();
+                displayWord();
+                displayScore();
+                displayTimeRemaining();
+            }
+
             displayWord();
             displayScore();
-            displayTimeRemaining();  // Display the remaining time
+            displayTimeRemaining();// Display the remaining time
             if (resultsBuffer[2] < 7000) {
                 Graphics_clearDisplay(&g_sContext);
                 next_word();
