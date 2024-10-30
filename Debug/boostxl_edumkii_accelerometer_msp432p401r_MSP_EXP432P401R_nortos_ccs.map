@@ -1,7 +1,7 @@
 ******************************************************************************
-                  TI ARM Linker PC v20.2.7                     
+                  TI ARM Linker PC v20.2.0                     
 ******************************************************************************
->> Linked Fri Oct 25 21:03:53 2024
+>> Linked Wed Oct 30 11:41:14 2024
 
 OUTPUT FILE NAME:   <boostxl_edumkii_accelerometer_msp432p401r_MSP_EXP432P401R_nortos_ccs.out>
 ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 000034f1
@@ -235,7 +235,7 @@ MODULE SUMMARY
     +--+----------------------------------------------------+-------+---------+---------+
        Total:                                               2012    960       0      
                                                                                      
-    C:\ti\ccs1280\ccs\tools\compiler\ti-cgt-arm_20.2.7.LTS\lib\rtsv7M4_T_le_v4SPD16_eabi.lib
+    C:\ti\ccs1000\ccs\tools\compiler\ti-cgt-arm_20.2.0.LTS\lib\rtsv7M4_T_le_v4SPD16_eabi.lib
        _printfi.c.obj                                       4851    0         0      
        fd_add_t2.asm.obj                                    438     0         0      
        fd_div_t2.asm.obj                                    310     0         0      

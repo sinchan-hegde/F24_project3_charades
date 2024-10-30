@@ -1,21 +1,16 @@
-#include <ti/devices/msp432p4xx/inc/msp.h>
-#include <ti/devices/msp432p4xx/driverlib/driverlib.h>
-#include <ti/grlib/grlib.h>
-#include "LcdDriver/Crystalfontz128x128_ST7735.h"
-#include <stdio.h>
+/*
+ * Project 3 Fall 2024 ECE 2564 - Charades
+ * Authors: Yuri Braga and Sinchan Hegde
+ * Version: November 2024
+ */
+
+#include "Application.h"
 
 /* Graphic library context */
 Graphics_Context g_sContext;
 
 /* ADC results buffer */
 static uint16_t resultsBuffer[3];
-
-/* Enum to represent tilt state */
-enum accel_state {UP, NORMAL, DOWN};
-static enum accel_state my_state = NORMAL;
-
-/* Words to display */
-char* words[3] = {"elephant", "ball", "Paris"};
 static int word_index = 0;
 
 /* Score variable */
@@ -26,14 +21,6 @@ static int elapsed_seconds = 0;  // Track elapsed time in seconds
 #define TIMEOUT_SECONDS 10        // Timeout value (10 seconds)
 #define LCD_WIDTH 128             // LCD screen width for centering text
 
-/* Function prototypes */
-void drawTitle(void);
-void drawAccelData(void);
-void displayWord(void);
-void displayScore(void);
-void displayTimeRemaining(void);
-void next_word(void);
-void reset_timer(void);
 
 /*
  * Main function
@@ -104,6 +91,42 @@ int main(void) {
     }
 }
 
+Application applicationConstruct()
+{
+    Application app;
+    app.state = Title;
+    app.printScreen = false;
+}
+
+void applicationLoop(Application *app)
+{
+    switch(app->state)
+    {
+    case Title:
+    {
+
+    }
+
+    }
+}
+
+void handleTitle(Application *app){
+    if(app->printScreen)
+    {
+        app->printScreen = false;
+        drawTitle();
+    }
+
+
+}
+
+void handleInstructions(Application *app){
+
+}
+
+void handleGame(Application *app){
+
+}
 void drawTitle() {
     Graphics_clearDisplay(&g_sContext);
     Graphics_drawStringCentered(&g_sContext, (int8_t *)"Accelerometer:", AUTO_STRING_LENGTH, 64, 30, OPAQUE_TEXT);
