@@ -1,6 +1,7 @@
 # FIXED
 
 main.obj: ../main.c
+main.obj: ../Application.h
 main.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/inc/msp.h
 main.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/inc/msp432p401r.h
 main.obj: C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.0.LTS/include/stdint.h
@@ -58,8 +59,10 @@ main.obj: ../LcdDriver/Crystalfontz128x128_ST7735.h
 main.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/grlib/grlib.h
 main.obj: C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.0.LTS/include/stdio.h
 main.obj: C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.0.LTS/include/stdarg.h
+main.obj: C:/Users/ymabr/Desktop/Fall\ 2024/ECE2564_Proj3/accelerometer_example/HAL/HAL.h
 
 ../main.c: 
+../Application.h: 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/inc/msp.h: 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/inc/msp432p401r.h: 
 C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.0.LTS/include/stdint.h: 
@@ -117,3 +120,4 @@ C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.0.LTS/include/assert.h:
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/grlib/grlib.h: 
 C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.0.LTS/include/stdio.h: 
 C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.0.LTS/include/stdarg.h: 
+C:/Users/ymabr/Desktop/Fall\ 2024/ECE2564_Proj3/accelerometer_example/HAL/HAL.h: 

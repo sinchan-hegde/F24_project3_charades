@@ -6,6 +6,7 @@
 #include <ti/grlib/grlib.h>
 #include "LcdDriver/Crystalfontz128x128_ST7735.h"
 #include <stdio.h>
+#include <HAL/HAL.h>
 
 #define MAX_PLAYERS 4
 
@@ -46,6 +47,8 @@ Application applicationConstruct();
 void handleTitle(Application *app);
 void handleInstructions(Application *app);
 void handleGame(Application *app);
+void initADC();
+void initSystem();
 
 
 

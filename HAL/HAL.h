@@ -9,10 +9,6 @@
 #ifndef HAL_HAL_H_
 #define HAL_HAL_H_
 
-#include <HAL/Button.h>
-#include <HAL/LED.h>
-#include <HAL/Timer.h>
-#include <HAL/Graphics.h>
 //#include <LcdDriver/Crystalfontz128x128_ST7735.h>
 
 //#include <HAL/LcdDriver>

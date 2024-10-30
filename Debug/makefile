@@ -12,6 +12,7 @@ GEN_CMDS__FLAG :=
 ORDERED_OBJS += \
 "./main.obj" \
 "./system_msp432p401r.obj" \
+"./HAL/HAL.obj" \
 "./LcdDriver/Crystalfontz128x128_ST7735.obj" \
 "./LcdDriver/HAL_MSP_EXP432P401R_Crystalfontz128x128_ST7735.obj" \
 "./ccs/startup_msp432p401r_ccs.obj" \
@@ -34,9 +35,11 @@ RMDIR := RMDIR /S/Q
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir_vars.mk
+-include HAL/subdir_vars.mk
 -include LcdDriver/subdir_vars.mk
 -include ccs/subdir_vars.mk
 -include subdir_rules.mk
+-include HAL/subdir_rules.mk
 -include LcdDriver/subdir_rules.mk
 -include ccs/subdir_rules.mk
 -include objects.mk
@@ -169,8 +172,8 @@ boostxl_edumkii_accelerometer_msp432p401r_MSP_EXP432P401R_nortos_ccs.hex: $(EXE_
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "main.obj" "system_msp432p401r.obj" "LcdDriver\Crystalfontz128x128_ST7735.obj" "LcdDriver\HAL_MSP_EXP432P401R_Crystalfontz128x128_ST7735.obj" "ccs\startup_msp432p401r_ccs.obj" 
-	-$(RM) "main.d" "system_msp432p401r.d" "LcdDriver\Crystalfontz128x128_ST7735.d" "LcdDriver\HAL_MSP_EXP432P401R_Crystalfontz128x128_ST7735.d" "ccs\startup_msp432p401r_ccs.d" 
+	-$(RM) "main.obj" "system_msp432p401r.obj" "HAL\HAL.obj" "LcdDriver\Crystalfontz128x128_ST7735.obj" "LcdDriver\HAL_MSP_EXP432P401R_Crystalfontz128x128_ST7735.obj" "ccs\startup_msp432p401r_ccs.obj" 
+	-$(RM) "main.d" "system_msp432p401r.d" "HAL\HAL.d" "LcdDriver\Crystalfontz128x128_ST7735.d" "LcdDriver\HAL_MSP_EXP432P401R_Crystalfontz128x128_ST7735.d" "ccs\startup_msp432p401r_ccs.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 
