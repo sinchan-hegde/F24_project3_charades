@@ -6,6 +6,7 @@
 #include <ti/grlib/grlib.h>
 #include <stdio.h>
 #include <HAL/HAL.h>
+#include <stdlib.h>
 
 #define MAX_PLAYERS 4
 
@@ -17,11 +18,12 @@ typedef enum
 
 struct _Application
 {
-int players;
+int totalPlayers;
 int scores[MAX_PLAYERS];
-int currentPlayer;
+int roundsPlayed;
 State state;
 bool printScreen;
+bool newRound;
 };
 typedef struct _Application Application;
 
@@ -31,7 +33,7 @@ enum accel_state {UP, NORMAL, DOWN};
 static enum accel_state my_state = NORMAL;
 
 /* Words to display */
-char* words[3] = {"elephant", "ball", "Paris"};
+char* words[30] = {"elephant", "airplane", "guitar","Swimming","Balloon","Whisper","Robot","Spider","Dancing","Pirate","Fireworks","Chef","Lion","Sleeping","Rainbow","Doctor","Superhero","Fishing","Laughing","Astronaut","Washing Machine","Dinosaur","Painting","Surfing","Clapping","Ghost","Bowling","Magician","Juggling","Campfire"};
 
 /* Function prototypes */
 void drawTitle(void);

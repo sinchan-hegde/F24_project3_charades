@@ -6,19 +6,13 @@
 
 #include "Application.h"
 
-
 /* Graphic library context */
 Graphics_Context g_sContext;
 
 /* ADC results buffer */
 static uint16_t resultsBuffer[3];
 
-/* Enum to represent tilt state */
-enum accel_state {UP, NORMAL, DOWN};
-static enum accel_state my_state = NORMAL;
-
 /* Words to display */
-char* words[30] = {"elephant", "airplane", "guitar","Swimming","Balloon","Whisper","Robot","Spider","Dancing","Pirate","Fireworks","Chef","Lion","Sleeping","Rainbow","Doctor","Superhero","Fishing","Laughing","Astronaut","Washing Machine","Dinosaur","Painting","Surfing","Clapping","Ghost","Bowling","Magician","Juggling","Campfire"};
 static int word_index = 0;
 
 /* Score variable */
@@ -213,6 +207,17 @@ void handleGame(Application *app, HAL *hal)
         app->printScreen = false;
         drawGame();
     }
+    if (app->newRound)
+    {
+        Timer32_startTimer(TIMER32_0_BASE, false);
+
+    }
+
+    if (app->roundsPlayed < app->totalPlayers)
+    {
+
+    }
+
     drawAccelData();
 
 }
@@ -227,16 +232,39 @@ void drawTitle()
     AUTO_STRING_LENGTH,
                                 64, 60, OPAQUE_TEXT);
     Graphics_drawStringCentered(&g_sContext, (int8_t*) "Press BB2 for instr.",
-       AUTO_STRING_LENGTH,
-                                   64, 90, OPAQUE_TEXT);
+    AUTO_STRING_LENGTH,
+                                64, 90, OPAQUE_TEXT);
 }
 
 void drawInstructions()
 {
+    GrContextFontSet(&g_sContext, &g_sFontCmss12i);
+
     Graphics_clearDisplay(&g_sContext);
     Graphics_drawStringCentered(&g_sContext, (int8_t*) "Instructions:",
     AUTO_STRING_LENGTH,
-                                64, 30, OPAQUE_TEXT);
+                                64, 10, OPAQUE_TEXT);
+    Graphics_drawStringCentered(&g_sContext, (int8_t*) "Look up:'",
+    AUTO_STRING_LENGTH,
+                                64, 25, OPAQUE_TEXT);
+    Graphics_drawStringCentered(&g_sContext, (int8_t*) "'Charades Heads Up!'",
+    AUTO_STRING_LENGTH,
+                                64, 40, OPAQUE_TEXT);
+    Graphics_drawStringCentered(&g_sContext,
+                                (int8_t*) "Follow the instructions",
+                                AUTO_STRING_LENGTH,
+                                64, 55, OPAQUE_TEXT);
+    Graphics_drawStringCentered(&g_sContext, (int8_t*) "keeping the LCD",
+    AUTO_STRING_LENGTH,
+                                64, 70, OPAQUE_TEXT);
+    Graphics_drawStringCentered(&g_sContext, (int8_t*) "perpendicular",
+    AUTO_STRING_LENGTH,
+                                64, 85, OPAQUE_TEXT);
+    Graphics_drawStringCentered(&g_sContext, (int8_t*) "to the ground",
+    AUTO_STRING_LENGTH,
+                                64, 100, OPAQUE_TEXT);
+    GrContextFontSet(&g_sContext, &g_sFontFixed6x8);
+
 }
 
 void drawSettings()
@@ -282,9 +310,9 @@ void displayTimeRemaining()
                                 64, 110, OPAQUE_TEXT);
 }
 
-
-void next_word() {
-    word_index = rand()%30;
+void next_word()
+{
+    word_index = rand() % 30;
     reset_timer();  // Reset the timer when the word changes
 }
 int get_remaining_time()
