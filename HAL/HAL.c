@@ -14,7 +14,7 @@
  *
  * @return a properly constructed API object.
  */
-HAL HAL_construct()
+HAL* HAL_construct()
 {
     // The API object which will be returned at the end of construction
     HAL hal;
@@ -49,12 +49,10 @@ HAL HAL_construct()
     hal.boosterpackJS = Button_construct(BOOSTERPACK_JS_PORT,
     BOOSTERPACK_JS_PIN);  // Joystick Button
 
-    // Construct the UART module inside of this HAL struct
-    //hal.uart = UART_construct(USB_UART_INSTANCE, USB_UART_PORT, USB_UART_PINS);
-
+    InitGraphics(&hal.GFX);
 
     // Once we have finished building the API, return the completed struct.
-    return hal;
+    return &hal;
 }
 
 /**

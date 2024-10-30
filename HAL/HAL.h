@@ -9,7 +9,11 @@
 #ifndef HAL_HAL_H_
 #define HAL_HAL_H_
 
-//#include <LcdDriver/Crystalfontz128x128_ST7735.h>
+#include <HAL/Button.h>
+#include <HAL/LED.h>
+#include <HAL/Timer.h>
+#include <HAL/Graphics.h>
+//#include <HAL/LcdDriver/Crystalfontz128x128_ST7735.h>
 
 //#include <HAL/LcdDriver>
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
@@ -57,7 +61,7 @@ struct _HAL
 typedef struct _HAL HAL;
 
 // Constructs an HAL object by calling the constructor of each individual member
-HAL HAL_construct();
+HAL* HAL_construct();
 
 // Refreshes all necessary inputs in the HAL
 void HAL_refresh(HAL *api);

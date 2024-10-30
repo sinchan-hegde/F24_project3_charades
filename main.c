@@ -17,8 +17,6 @@ static int word_index = 0;
 static int score = 0;
 
 /* Timer-related variables */
-static int elapsed_seconds = 0;  // Track elapsed time in seconds
-#define TIMEOUT_SECONDS 10        // Timeout value (10 seconds)
 #define LCD_WIDTH 128             // LCD screen width for centering text
 
 /*
@@ -26,37 +24,20 @@ static int elapsed_seconds = 0;  // Track elapsed time in seconds
  */
 int main(void)
 {
-
-    initSystem();
-    initADC();
-    HAL_construct();
-    Application app = applicationConstruct();
-    initGraphics();
+    initialize();
+    HAL hal = *(HAL_construct());
+    Application app = *(applicationConstruct());
 
     while (1)
     {
         MAP_PCM_gotoLPM0();  // Low-power mode
-        applicationLoop(&app);
+        applicationLoop(&app, &hal);
     }
 }
-void initGraphics()
-{
-    /* Initializes display */
-    Crystalfontz128x128_Init();
-    Crystalfontz128x128_SetOrientation(LCD_ORIENTATION_UP);
 
-    /* Initializes graphics context */
-    Graphics_initContext(&g_sContext, &g_sCrystalfontz128x128,
-                         &g_sCrystalfontz128x128_funcs);
-    Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_RED);
-    Graphics_setBackgroundColor(&g_sContext, GRAPHICS_COLOR_WHITE);
-    GrContextFontSet(&g_sContext, &g_sFontFixed6x8);
-}
-
-void initSystem()
+void initialize()
 {
     /* Halting WDT and disabling master interrupts */
-
     MAP_WDT_A_holdTimer();
     MAP_Interrupt_disableMaster();
 
@@ -73,10 +54,20 @@ void initSystem()
     MAP_CS_initClockSignal(CS_HSMCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
     MAP_CS_initClockSignal(CS_SMCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
     MAP_CS_initClockSignal(CS_ACLK, CS_REFOCLK_SELECT, CS_CLOCK_DIVIDER_1);
-}
 
-void initADC()
-{
+    /* Initializes display */
+    Crystalfontz128x128_Init();
+    Crystalfontz128x128_SetOrientation(LCD_ORIENTATION_UP);
+
+    /* Initializes graphics context */
+    Graphics_initContext(&g_sContext, &g_sCrystalfontz128x128,
+                         &g_sCrystalfontz128x128_funcs);
+    Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_RED);
+    Graphics_setBackgroundColor(&g_sContext, GRAPHICS_COLOR_WHITE);
+    GrContextFontSet(&g_sContext, &g_sFontFixed6x8);
+
+    //  drawTitle();
+
     /* Configures ADC input pins */
     MAP_GPIO_setAsPeripheralModuleFunctionInputPin(
             GPIO_PORT_P4, GPIO_PIN0 | GPIO_PIN2, GPIO_TERTIARY_MODULE_FUNCTION);
@@ -117,28 +108,46 @@ void initADC()
     MAP_ADC14_toggleConversionTrigger();
 
     MAP_Interrupt_enableMaster();
+    initButtons();
 }
 
-Application applicationConstruct()
+Application* applicationConstruct()
 {
     Application app;
     app.state = Title;
-    app.printScreen = false;
+    app.printScreen = true;
+    return &app;
 }
 
-void applicationLoop(Application *app)
+void applicationLoop(Application *app, HAL *hal)
 {
     switch (app->state)
     {
     case Title:
     {
+        handleTitle(app, hal);
+        break;
+    }
+    case Instructions:
+    {
+        handleInstructions(app, hal);
+        break;
+    }
+    case Settings:
+    {
+        handleSettings(app, hal);
+        break;
 
     }
-
+    case Game:
+    {
+        handleGame(app, hal);
+        break;
+    }
     }
 }
 
-void handleTitle(Application *app)
+void handleTitle(Application *app, HAL *hal)
 {
     if (app->printScreen)
     {
@@ -146,24 +155,96 @@ void handleTitle(Application *app)
         drawTitle();
     }
 
+    if (BB1tapped())
+    {
+        app->printScreen = true;
+        app->state = Settings;
+    }
+    if (BB2tapped())
+    {
+        app->printScreen = true;
+        app->state = Instructions;
+    }
+
 }
 
-void handleInstructions(Application *app)
+void handleSettings(Application *app, HAL *hal)
 {
+    if (app->printScreen)
+    {
+        app->printScreen = false;
+        drawSettings();
+    }
 
+    if (BB1tapped())
+    {
+        app->printScreen = true;
+        app->state = Game;
+    }
 }
 
-void handleGame(Application *app)
+void handleInstructions(Application *app, HAL *hal)
 {
+    if (app->printScreen)
+    {
+        app->printScreen = false;
+        drawInstructions();
+    }
+
+    if (BB2tapped())
+    {
+        app->printScreen = true;
+        app->state = Title;
+    }
+}
+
+void handleGame(Application *app, HAL *hal)
+{
+    if (app->printScreen)
+    {
+        app->printScreen = false;
+        drawGame();
+    }
+    drawAccelData();
 
 }
+
 void drawTitle()
 {
     Graphics_clearDisplay(&g_sContext);
-    Graphics_drawStringCentered(&g_sContext, (int8_t*) "Accelerometer:",
+    Graphics_drawStringCentered(&g_sContext, (int8_t*) "Welcome to Charades:",
     AUTO_STRING_LENGTH,
                                 64, 30, OPAQUE_TEXT);
-    drawAccelData();
+    Graphics_drawStringCentered(&g_sContext, (int8_t*) "Press BB1 to proceed.",
+    AUTO_STRING_LENGTH,
+                                64, 60, OPAQUE_TEXT);
+    Graphics_drawStringCentered(&g_sContext, (int8_t*) "Press BB2 for instr.",
+       AUTO_STRING_LENGTH,
+                                   64, 90, OPAQUE_TEXT);
+}
+
+void drawInstructions()
+{
+    Graphics_clearDisplay(&g_sContext);
+    Graphics_drawStringCentered(&g_sContext, (int8_t*) "Instructions:",
+    AUTO_STRING_LENGTH,
+                                64, 30, OPAQUE_TEXT);
+}
+
+void drawSettings()
+{
+    Graphics_clearDisplay(&g_sContext);
+    Graphics_drawStringCentered(&g_sContext, (int8_t*) "Settings:",
+    AUTO_STRING_LENGTH,
+                                64, 30, OPAQUE_TEXT);
+}
+
+void drawGame()
+{
+    Graphics_clearDisplay(&g_sContext);
+    Graphics_drawStringCentered(&g_sContext, (int8_t*) "Charades:",
+    AUTO_STRING_LENGTH,
+                                64, 30, OPAQUE_TEXT);
 }
 
 void displayWord()
@@ -198,6 +279,12 @@ void next_word()
     word_index = (word_index + 1) % 3;
     reset_timer();  // Reset the timer when the word changes
 }
+int get_remaining_time()
+{
+    int time = MAP_Timer32_getValue(TIMER32_0_BASE);
+    int time_remaining = time / 48000000;
+    return time_remaining;
+}
 
 void reset_timer()
 {
@@ -213,6 +300,15 @@ void drawAccelData()
     {
     case NORMAL:
         MAP_Timer32_startTimer(TIMER32_0_BASE, false);
+        if (get_remaining_time() == 0)
+        {
+            Graphics_clearDisplay(&g_sContext);
+            next_word();
+            displayWord();
+            displayScore();
+            displayTimeRemaining();
+        }
+
         displayWord();
         displayScore();
         displayTimeRemaining();  // Display the remaining time
@@ -232,7 +328,6 @@ void drawAccelData()
         }
         break;
     case DOWN:
-
         score++;
         displayWord();
         displayScore();
@@ -251,20 +346,6 @@ void drawAccelData()
     }
 }
 
-/* Timer32 ISR - Triggered every 1 second */
-void T32_INT1_IRQHandler(void)
-{
-    MAP_Timer32_clearInterruptFlag(TIMER32_0_BASE);
-    elapsed_seconds++;
-
-    displayTimeRemaining();  // Update the time display every second
-
-    if (elapsed_seconds >= TIMEOUT_SECONDS)
-    {
-        next_word();  // Change the word if 10 seconds pass
-    }
-}
-
 void ADC14_IRQHandler(void)
 {
     uint64_t status = MAP_ADC14_getEnabledInterruptStatus();
@@ -276,6 +357,6 @@ void ADC14_IRQHandler(void)
         resultsBuffer[1] = ADC14_getResult(ADC_MEM1);
         resultsBuffer[2] = ADC14_getResult(ADC_MEM2);
 
-        drawAccelData();  // Update display based on accelerometer data
+        //drawAccelData();  // Update display based on accelerometer data
     }
 }

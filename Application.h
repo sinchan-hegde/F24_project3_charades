@@ -4,7 +4,6 @@
 #include <ti/devices/msp432p4xx/inc/msp.h>
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include <ti/grlib/grlib.h>
-#include "LcdDriver/Crystalfontz128x128_ST7735.h"
 #include <stdio.h>
 #include <HAL/HAL.h>
 
@@ -13,7 +12,7 @@
 
 typedef enum
 {
-    Title, Configurations, Instructions, Test, Results, Scores
+    Title, Settings, Instructions, Game, Results, Scores
 } State;
 
 struct _Application
@@ -42,14 +41,16 @@ void displayScore(void);
 void displayTimeRemaining(void);
 void next_word(void);
 void reset_timer(void);
-void applicationLoop(Application *app);
-Application applicationConstruct();
-void handleTitle(Application *app);
-void handleInstructions(Application *app);
-void handleGame(Application *app);
-void initADC();
-void initSystem();
-
+void applicationLoop(Application *app, HAL *hal);
+Application* applicationConstruct();
+void handleTitle(Application *app, HAL *hal);
+void handleInstructions(Application *, HAL *hal);
+void handleGame(Application *app, HAL *hal);
+void handleSettings(Application *app, HAL *hal);
+void initialize();
+void drawInstructions();
+void drawGame();
+void drawSettings();
 
 
 #endif

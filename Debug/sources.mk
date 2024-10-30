@@ -113,6 +113,6 @@ PDE_DEPS__QUOTED :=
 SUBDIRS := \
 . \
 HAL \
-LcdDriver \
+HAL/LcdDriver \
 ccs \
 

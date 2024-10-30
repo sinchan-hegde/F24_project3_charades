@@ -55,11 +55,16 @@ main.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/
 main.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/flash.h
 main.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/grlib/grlib.h
 main.obj: C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.0.LTS/include/assert.h
-main.obj: ../LcdDriver/Crystalfontz128x128_ST7735.h
-main.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/grlib/grlib.h
 main.obj: C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.0.LTS/include/stdio.h
 main.obj: C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.0.LTS/include/stdarg.h
 main.obj: C:/Users/ymabr/Desktop/Fall\ 2024/ECE2564_Proj3/accelerometer_example/HAL/HAL.h
+main.obj: C:/Users/ymabr/Desktop/Fall\ 2024/ECE2564_Proj3/accelerometer_example/HAL/Button.h
+main.obj: C:/Users/ymabr/Desktop/Fall\ 2024/ECE2564_Proj3/accelerometer_example/HAL/Timer.h
+main.obj: C:/Users/ymabr/Desktop/Fall\ 2024/ECE2564_Proj3/accelerometer_example/HAL/LED.h
+main.obj: C:/Users/ymabr/Desktop/Fall\ 2024/ECE2564_Proj3/accelerometer_example/HAL/Graphics.h
+main.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/grlib/grlib.h
+main.obj: C:/Users/ymabr/Desktop/Fall\ 2024/ECE2564_Proj3/accelerometer_example/HAL/LcdDriver/Crystalfontz128x128_ST7735.h
+main.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/grlib/grlib.h
 
 ../main.c: 
 ../Application.h: 
@@ -116,8 +121,13 @@ C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/flash.h: 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/grlib/grlib.h: 
 C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.0.LTS/include/assert.h: 
-../LcdDriver/Crystalfontz128x128_ST7735.h: 
-C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/grlib/grlib.h: 
 C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.0.LTS/include/stdio.h: 
 C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.0.LTS/include/stdarg.h: 
 C:/Users/ymabr/Desktop/Fall\ 2024/ECE2564_Proj3/accelerometer_example/HAL/HAL.h: 
+C:/Users/ymabr/Desktop/Fall\ 2024/ECE2564_Proj3/accelerometer_example/HAL/Button.h: 
+C:/Users/ymabr/Desktop/Fall\ 2024/ECE2564_Proj3/accelerometer_example/HAL/Timer.h: 
+C:/Users/ymabr/Desktop/Fall\ 2024/ECE2564_Proj3/accelerometer_example/HAL/LED.h: 
+C:/Users/ymabr/Desktop/Fall\ 2024/ECE2564_Proj3/accelerometer_example/HAL/Graphics.h: 
+C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/grlib/grlib.h: 
+C:/Users/ymabr/Desktop/Fall\ 2024/ECE2564_Proj3/accelerometer_example/HAL/LcdDriver/Crystalfontz128x128_ST7735.h: 
+C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/grlib/grlib.h: 
