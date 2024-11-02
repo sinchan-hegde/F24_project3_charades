@@ -1,3 +1,4 @@
+
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
 
@@ -6,6 +7,7 @@
 #include <ti/grlib/grlib.h>
 #include <stdio.h>
 #include <HAL/HAL.h>
+#include <stdlib.h>
 
 #define MAX_PLAYERS 4
 
@@ -17,11 +19,12 @@ typedef enum
 
 struct _Application
 {
-int players;
+int totalPlayers;
 int scores[MAX_PLAYERS];
-int currentPlayer;
+int roundsPlayed;
 State state;
 bool printScreen;
+bool newRound;
 };
 typedef struct _Application Application;
 
@@ -51,6 +54,8 @@ void initialize();
 void drawInstructions();
 void drawGame();
 void drawSettings();
+void end_game();
+void handleScores();
 
 
 #endif
