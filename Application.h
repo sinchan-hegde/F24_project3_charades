@@ -25,6 +25,7 @@ int roundsPlayed;
 State state;
 bool printScreen;
 bool newRound;
+bool added;
 };
 typedef struct _Application Application;
 

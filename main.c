@@ -101,7 +101,7 @@ void initialize()
     /* Timer32 configuration */
     MAP_Timer32_initModule(TIMER32_0_BASE, TIMER32_PRESCALER_1, TIMER32_32BIT,
     TIMER32_PERIODIC_MODE);
-    MAP_Timer32_setCount(TIMER32_0_BASE,2880000000); // 60-second timer (48 MHz)
+    MAP_Timer32_setCount(TIMER32_0_BASE, 2880000000); // 60-second timer (48 MHz)
     MAP_Interrupt_enableInterrupt(INT_T32_INT1);
     MAP_Timer32_enableInterrupt(TIMER32_0_BASE);
     MAP_Timer32_startTimer(TIMER32_0_BASE, true);
@@ -182,23 +182,25 @@ void intToString(int num, char *str)
 void printScores(Application *app, HAL *hal)
 {
     GFX GFX = hal->GFX;
-    GFX_print(GFX, "Test        ", 0, 0);
-    GFX_print(GFX, "Mean:", 7, 0);
+    GFX_print(&GFX, "Scores        ", 0, 0);
+    //GFX_print(&GFX, "Mean:", 7, 0);
     int i;
     double total = 0;
-    for (i = 0; i < app_p->totalPlayers; i++)
+    char *score;
+    for (i = 0; i < app->totalPlayers; i++)
     {
-       app_p->scores[i];
+        intToString(app->scores[i], score);
+        GFX_print(&GFX, score, 2 + i, 3);
     }
 
     char meanTime[12];
     intToString(total, meanTime);
-    GFX_print(GFX, meanTime, 7, 4);
-    GFX_print(GFX, "ms", 7, 6);
+    GFX_print(&GFX, meanTime, 7, 4);
+    GFX_print(&GFX, "ms", 7, 6);
 
-    GFX_print(GFX, "                                  ", 8, 0);
+    GFX_print(&GFX, "                                  ", 8, 0);
 
-    GFX_print(GFX, "Press BB2 to end    ", 9, 0);
+    GFX_print(&GFX, "Press BB2 to end    ", 9, 0);
 }
 
 void handleTitle(Application *app, HAL *hal)
@@ -351,17 +353,6 @@ void displayScore()
                                 64, 90, OPAQUE_TEXT);
 }
 
-void displayTimeRemaining()
-{
-    char timeStr[20];
-    uint32_t timer_value = MAP_Timer32_getValue(TIMER32_0_BASE);
-    uint32_t remaining_time = timer_value / 48000000;
-    sprintf(timeStr, "Time: %d s", remaining_time);
-    Graphics_drawStringCentered(&g_sContext, (int8_t*) timeStr,
-    AUTO_STRING_LENGTH,
-                                64, 110, OPAQUE_TEXT);
-}
-
 void next_word()
 {
     word_index = rand() % 30;
@@ -373,15 +364,28 @@ int get_remaining_time()
     return time_remaining;
 }
 
-void end_game(){
+void end_game()
+{
     char final_score[20];
     Graphics_clearDisplay(&g_sContext);
     sprintf(final_score, "Your final score: %d ", score);
     Graphics_drawStringCentered(&g_sContext, (int8_t*) final_score,
-        AUTO_STRING_LENGTH,
-                                    64, 90, OPAQUE_TEXT);
+    AUTO_STRING_LENGTH,
+                                64, 90, OPAQUE_TEXT);
 
 }
+
+void displayTimeRemaining()
+{
+    char timeStr[20];
+    uint32_t timer_value = MAP_Timer32_getValue(TIMER32_0_BASE);
+    uint32_t remaining_time = timer_value / 48000000;
+    sprintf(timeStr, "Time: %d s", remaining_time);
+    Graphics_drawStringCentered(&g_sContext, (int8_t*) timeStr,
+    AUTO_STRING_LENGTH,
+                                64, 110, OPAQUE_TEXT);
+}
+
 void drawAccelData()
 {
     switch (my_state)
@@ -391,7 +395,7 @@ void drawAccelData()
         if (get_remaining_time() == 0)
         {
             Graphics_clearDisplay(&g_sContext);
-           end_game();
+            end_game();
         }
 
         displayWord();
@@ -403,7 +407,7 @@ void drawAccelData()
             next_word();
             my_state = DOWN;
         }
-        else if (resultsBuffer[2] > 11500)
+        else if (resultsBuffer[2] > 10500)
         {
             Graphics_clearDisplay(&g_sContext);
             next_word();
@@ -411,17 +415,22 @@ void drawAccelData()
         }
         break;
     case DOWN:
-        score++;
+        displayTimeRemaining();
         displayWord();
         displayScore();
-        displayTimeRemaining();
-        my_state = NORMAL;
+        if (resultsBuffer[2] > 7000)
+        {
+            score++;
+
+            my_state = NORMAL;
+        }
+        // my_state = NORMAL;
         break;
     case UP:
         displayWord();
         displayScore();
         displayTimeRemaining();
-        if (resultsBuffer[2] < 11000)
+        if (resultsBuffer[2] < 10000)
         {
             my_state = NORMAL;
         }
@@ -446,3 +455,4 @@ void ADC14_IRQHandler(void)
 //        }
     }
 }
+
