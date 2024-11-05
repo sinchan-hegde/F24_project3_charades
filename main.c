@@ -19,8 +19,10 @@ static int word_index = 0;
 static int score = 0;
 static volatile bool initialized = false;
 /* Timer-related variables */
-#define LCD_WIDTH 128             // LCD screen width for centering text
-
+#define LCD_WIDTH 128    // LCD screen width for centering text
+#define TIMER_VALUE 60   //timer value is 60 seconds
+#define CLK_FRQ 48000000 //clock frequency
+#define TIMER_COUNT_VALUE 2880000000
 /*
  * Main function
  */
@@ -99,7 +101,7 @@ void initialize()
     /* Timer32 configuration */
     MAP_Timer32_initModule(TIMER32_0_BASE, TIMER32_PRESCALER_1, TIMER32_32BIT,
     TIMER32_PERIODIC_MODE);
-    MAP_Timer32_setCount(TIMER32_0_BASE, 480000000); // 1-second interval (48 MHz)
+    MAP_Timer32_setCount(TIMER32_0_BASE,2880000000); // 60-second timer (48 MHz)
     MAP_Interrupt_enableInterrupt(INT_T32_INT1);
     MAP_Timer32_enableInterrupt(TIMER32_0_BASE);
     MAP_Timer32_startTimer(TIMER32_0_BASE, true);
@@ -259,7 +261,7 @@ void handleGame(Application *app, HAL *hal)
     }
     if (app->newRound)
     {
-        Timer32_startTimer(TIMER32_0_BASE, false);
+        Timer32_startTimer(TIMER32_0_BASE, true);
 
     }
 
@@ -352,8 +354,8 @@ void displayScore()
 void displayTimeRemaining()
 {
     char timeStr[20];
-    int timer_value = MAP_Timer32_getValue(TIMER32_0_BASE);
-    int remaining_time = timer_value / 48000000;
+    uint32_t timer_value = MAP_Timer32_getValue(TIMER32_0_BASE);
+    uint32_t remaining_time = timer_value / 48000000;
     sprintf(timeStr, "Time: %d s", remaining_time);
     Graphics_drawStringCentered(&g_sContext, (int8_t*) timeStr,
     AUTO_STRING_LENGTH,
@@ -363,7 +365,6 @@ void displayTimeRemaining()
 void next_word()
 {
     word_index = rand() % 30;
-    reset_timer();  // Reset the timer when the word changes
 }
 int get_remaining_time()
 {
@@ -372,27 +373,25 @@ int get_remaining_time()
     return time_remaining;
 }
 
-void reset_timer()
-{
-    MAP_Timer32_haltTimer(TIMER32_0_BASE);  // Stop the timer
-    MAP_Timer32_setCount(TIMER32_0_BASE, 480000000);  // Reload the timer count
-    MAP_Timer32_startTimer(TIMER32_0_BASE, false);
-    displayTimeRemaining();  // Immediately update the time display
-}
+void end_game(){
+    char final_score[20];
+    Graphics_clearDisplay(&g_sContext);
+    sprintf(final_score, "Your final score: %d ", score);
+    Graphics_drawStringCentered(&g_sContext, (int8_t*) final_score,
+        AUTO_STRING_LENGTH,
+                                    64, 90, OPAQUE_TEXT);
 
+}
 void drawAccelData()
 {
     switch (my_state)
     {
     case NORMAL:
-        MAP_Timer32_startTimer(TIMER32_0_BASE, false);
+        //MAP_Timer32_startTimer(TIMER32_0_BASE, true);
         if (get_remaining_time() == 0)
         {
             Graphics_clearDisplay(&g_sContext);
-            next_word();
-            displayWord();
-            displayScore();
-            displayTimeRemaining();
+           end_game();
         }
 
         displayWord();
@@ -402,14 +401,12 @@ void drawAccelData()
         {
             Graphics_clearDisplay(&g_sContext);
             next_word();
-            reset_timer();
             my_state = DOWN;
         }
         else if (resultsBuffer[2] > 11500)
         {
             Graphics_clearDisplay(&g_sContext);
             next_word();
-            reset_timer();
             my_state = UP;
         }
         break;

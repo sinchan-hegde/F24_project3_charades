@@ -1,3 +1,4 @@
+
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
 
@@ -53,6 +54,8 @@ void initialize();
 void drawInstructions();
 void drawGame();
 void drawSettings();
+void end_game();
+void handleScores();
 
 
 #endif
