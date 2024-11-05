@@ -17,7 +17,7 @@ static int word_index = 0;
 
 /* Score variable */
 static int score = 0;
-
+static volatile bool initialized = false;
 /* Timer-related variables */
 #define LCD_WIDTH 128             // LCD screen width for centering text
 
@@ -158,18 +158,45 @@ void applicationLoop(Application *app, HAL *hal)
 void handleScores(Application *app, HAL *hal)
 {
     if (app->printScreen)
-     {
-         app->printScreen = false;
-         drawTitle();
-     }
+    {
+        app->printScreen = false;
 
-     if (BB1tapped())
-     {
-         app->printScreen = true;
-         app->state = Title;
-         *(app) = *(applicationConstruct());
-     }
+    }
 
+    if (BB1tapped())
+    {
+        app->printScreen = true;
+        app->state = Title;
+        *(app) = *(applicationConstruct());
+    }
+
+}
+//Converts int to string
+void intToString(int num, char *str)
+{
+    sprintf(str, "%d", num);
+}
+
+void printScores(Application *app, HAL *hal)
+{
+    GFX GFX = hal->GFX;
+    GFX_print(GFX, "Test        ", 0, 0);
+    GFX_print(GFX, "Mean:", 7, 0);
+    int i;
+    double total = 0;
+    for (i = 0; i < app_p->totalPlayers; i++)
+    {
+       app_p->scores[i];
+    }
+
+    char meanTime[12];
+    intToString(total, meanTime);
+    GFX_print(GFX, meanTime, 7, 4);
+    GFX_print(GFX, "ms", 7, 6);
+
+    GFX_print(GFX, "                                  ", 8, 0);
+
+    GFX_print(GFX, "Press BB2 to end    ", 9, 0);
 }
 
 void handleTitle(Application *app, HAL *hal)
@@ -415,7 +442,10 @@ void ADC14_IRQHandler(void)
         resultsBuffer[0] = ADC14_getResult(ADC_MEM0);
         resultsBuffer[1] = ADC14_getResult(ADC_MEM1);
         resultsBuffer[2] = ADC14_getResult(ADC_MEM2);
-
-        //drawAccelData();  // Update display based on accelerometer data
+//        if (initialized)
+//        {
+//            drawAccelData();  // Update display based on accelerometer data
+//
+//        }
     }
 }
