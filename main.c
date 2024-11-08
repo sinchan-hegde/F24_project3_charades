@@ -26,6 +26,19 @@ static volatile bool initialized = false;
 /*
  * Main function
  */
+void sleep()
+{
+    // The Launchpad Green LED is used to signify the processor is in low-power
+    // mode. From the human perspective, it should seem the processor is always
+    // asleep except for fractions of second here and there.
+
+    TurnOn_LLG();
+    // Enters the Low Power Mode 0 - the processor is asleep and only responds to
+    // interrupts
+    PCM_gotoLPM0();
+    TurnOff_LLG();
+}
+
 int main(void)
 {
     initialize();
@@ -34,7 +47,7 @@ int main(void)
 
     while (1)
     {
-        MAP_PCM_gotoLPM0();  // Low-power mode
+        sleep();  // Low-power mode
         applicationLoop(&app, &hal);
     }
 }
@@ -236,6 +249,8 @@ void handleSettings(Application *app, HAL *hal)
     {
         app->printScreen = true;
         app->state = Game;
+        displayWord();
+        displayScore();
     }
 }
 
@@ -398,20 +413,24 @@ void drawAccelData()
             end_game();
         }
 
-        displayWord();
-        displayScore();
+//        displayWord();
+//        displayScore();
         displayTimeRemaining();  // Display the remaining time
         if (resultsBuffer[2] < 7000)
         {
             Graphics_clearDisplay(&g_sContext);
             next_word();
             my_state = DOWN;
+            displayWord();
+            displayScore();
         }
         else if (resultsBuffer[2] > 10500)
         {
             Graphics_clearDisplay(&g_sContext);
             next_word();
             my_state = UP;
+            displayWord();
+            displayScore();
         }
         break;
     case DOWN:
@@ -423,15 +442,18 @@ void drawAccelData()
             score++;
 
             my_state = NORMAL;
+            displayWord();
+            displayScore();
         }
         // my_state = NORMAL;
         break;
     case UP:
-        displayWord();
-        displayScore();
+
         displayTimeRemaining();
         if (resultsBuffer[2] < 10000)
         {
+            displayWord();
+            displayScore();
             my_state = NORMAL;
         }
         break;
@@ -448,11 +470,7 @@ void ADC14_IRQHandler(void)
         resultsBuffer[0] = ADC14_getResult(ADC_MEM0);
         resultsBuffer[1] = ADC14_getResult(ADC_MEM1);
         resultsBuffer[2] = ADC14_getResult(ADC_MEM2);
-//        if (initialized)
-//        {
-//            drawAccelData();  // Update display based on accelerometer data
-//
-//        }
+
     }
 }
 
