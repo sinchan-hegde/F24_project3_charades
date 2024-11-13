@@ -7,13 +7,13 @@
 #include "Application.h"
 
 /* Graphic library context */
-Graphics_Context g_sContext;
+volatile Graphics_Context g_sContext;
 
 /* ADC results buffer */
 static uint16_t resultsBuffer[3];
 
 /* Words to display */
-static int word_index = 0;
+volatile int word_index = 0;
 
 /* Score variable */
 static int score = 0;
@@ -43,7 +43,7 @@ int main(void)
 {
     initialize();
     HAL hal = *(HAL_construct());
-    Application app = *(applicationConstruct());
+    Application app = (applicationConstruct());
 
     while (1)
     {
@@ -114,10 +114,10 @@ void initialize()
     /* Timer32 configuration */
     MAP_Timer32_initModule(TIMER32_0_BASE, TIMER32_PRESCALER_1, TIMER32_32BIT,
     TIMER32_PERIODIC_MODE);
-    MAP_Timer32_setCount(TIMER32_0_BASE, 2880000000); // 60-second timer (48 MHz)
+    MAP_Timer32_setCount(TIMER32_0_BASE, 96000000); // 60-second timer (48 MHz)
     MAP_Interrupt_enableInterrupt(INT_T32_INT1);
     MAP_Timer32_enableInterrupt(TIMER32_0_BASE);
-    MAP_Timer32_startTimer(TIMER32_0_BASE, true);
+    //MAP_Timer32_startTimer(TIMER32_0_BASE, true);
 
     /* Start ADC conversion */
     MAP_ADC14_enableSampleTimer(ADC_AUTOMATIC_ITERATION);
@@ -128,12 +128,12 @@ void initialize()
     initButtons();
 }
 
-Application* applicationConstruct()
+Application applicationConstruct()
 {
     Application app;
     app.state = Title;
     app.printScreen = true;
-    return &app;
+    return app;
 }
 
 void applicationLoop(Application *app, HAL *hal)
@@ -163,7 +163,7 @@ void applicationLoop(Application *app, HAL *hal)
     }
     case Scores:
     {
-        handleScores();
+        handleScores(app, hal);
         break;
     }
 
@@ -176,13 +176,22 @@ void handleScores(Application *app, HAL *hal)
     {
         app->printScreen = false;
 
-    }
 
-    if (BB1tapped())
+    }
+    char final_score[20];
+
+            sprintf(final_score, "Your final score: %d", score);
+            Graphics_drawStringCentered(&g_sContext, (int8_t*) final_score,
+                                        AUTO_STRING_LENGTH, 64, 90, OPAQUE_TEXT);
+            Graphics_drawStringCentered(&g_sContext, (int8_t*) "Press BB2 to return",
+                                        AUTO_STRING_LENGTH, 64, 110, OPAQUE_TEXT);
+
+    if (BB2tapped())
     {
         app->printScreen = true;
         app->state = Title;
-        *(app) = *(applicationConstruct());
+        *app = applicationConstruct();
+
     }
 
 }
@@ -227,7 +236,7 @@ void handleTitle(Application *app, HAL *hal)
     if (BB1tapped())
     {
         app->printScreen = true;
-        app->state = Settings;
+        app->state = Game;
     }
     if (BB2tapped())
     {
@@ -274,6 +283,7 @@ void handleGame(Application *app, HAL *hal)
     if (app->printScreen)
     {
         app->printScreen = false;
+        MAP_Timer32_startTimer(TIMER32_0_BASE, true);
         drawGame();
     }
     if (app->newRound)
@@ -288,6 +298,13 @@ void handleGame(Application *app, HAL *hal)
     }
 
     drawAccelData();
+    if (get_remaining_time() == 0)
+            {
+                Graphics_clearDisplay(&g_sContext);
+                app->printScreen = false;
+                app->state = Scores;
+
+            }
 
 }
 
@@ -347,14 +364,14 @@ void drawSettings()
 void drawGame()
 {
     Graphics_clearDisplay(&g_sContext);
-    Graphics_drawStringCentered(&g_sContext, (int8_t*) "Charades:",
-    AUTO_STRING_LENGTH,
-                                64, 30, OPAQUE_TEXT);
+
 }
 
 void displayWord()
 {
-    Graphics_drawStringCentered(&g_sContext, (int8_t*) words[word_index],
+    char word[20];
+    sprintf(word, "word: %s", words[word_index]);
+    Graphics_drawStringCentered(&g_sContext, (int8_t*) word,
     AUTO_STRING_LENGTH,
                                 64, 64, OPAQUE_TEXT);
 }
@@ -379,16 +396,17 @@ int get_remaining_time()
     return time_remaining;
 }
 
-void end_game()
-{
-    char final_score[20];
-    Graphics_clearDisplay(&g_sContext);
-    sprintf(final_score, "Your final score: %d ", score);
-    Graphics_drawStringCentered(&g_sContext, (int8_t*) final_score,
-    AUTO_STRING_LENGTH,
-                                64, 90, OPAQUE_TEXT);
-
-}
+//void end_game()
+//{
+//    char final_score[20];
+//    Graphics_clearDisplay(&g_sContext);
+//    sprintf(final_score, "Your final score: %d ", score);
+//    Graphics_drawStringCentered(&g_sContext, (int8_t*) final_score,
+//    AUTO_STRING_LENGTH,
+//                                64, 90, OPAQUE_TEXT);
+//
+//
+//}
 
 void displayTimeRemaining()
 {
@@ -407,14 +425,10 @@ void drawAccelData()
     {
     case NORMAL:
         //MAP_Timer32_startTimer(TIMER32_0_BASE, true);
-        if (get_remaining_time() == 0)
-        {
-            Graphics_clearDisplay(&g_sContext);
-            end_game();
-        }
 
-//        displayWord();
-//        displayScore();
+
+        displayWord();
+        displayScore();
         displayTimeRemaining();  // Display the remaining time
         if (resultsBuffer[2] < 7000)
         {
@@ -473,4 +487,3 @@ void ADC14_IRQHandler(void)
 
     }
 }
-
