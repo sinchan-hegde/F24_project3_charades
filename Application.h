@@ -46,7 +46,7 @@ void displayTimeRemaining(void);
 void next_word(void);
 void reset_timer(void);
 void applicationLoop(Application *app, HAL *hal);
-Application* applicationConstruct();
+Application applicationConstruct();
 void handleTitle(Application *app, HAL *hal);
 void handleInstructions(Application *, HAL *hal);
 void handleGame(Application *app, HAL *hal);
@@ -57,6 +57,7 @@ void drawGame();
 void drawSettings();
 void end_game();
 void handleScores();
+int get_remaining_time();
 
 
 #endif
