@@ -1,4 +1,5 @@
 
+
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
 
@@ -14,7 +15,7 @@
 
 typedef enum
 {
-    Title, Settings, Instructions, Game, Results, Scores
+    Title, Instructions, Game, Results, Scores
 } State;
 
 struct _Application
@@ -51,6 +52,7 @@ void handleTitle(Application *app, HAL *hal);
 void handleInstructions(Application *, HAL *hal);
 void handleGame(Application *app, HAL *hal);
 void handleSettings(Application *app, HAL *hal);
+void handleResults();
 void initialize();
 void drawInstructions();
 void drawGame();
