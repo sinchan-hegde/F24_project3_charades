@@ -203,6 +203,7 @@ void handleScores(Application *app, HAL *hal)
     }
 
 }
+
 void handleResults(Application *app, HAL *hal)
 {
     if(app->printScreen)
@@ -223,6 +224,7 @@ void handleResults(Application *app, HAL *hal)
 
             }
 }
+
 
 //Converts int to string
 void intToString(int num, char *str)
@@ -290,8 +292,10 @@ void handleInstructions(Application *app, HAL *hal)
 
     if (BB2tapped())
     {
+        drawTitle();
         app->printScreen = true;
         app->state = Title;
+
     }
 }
 
@@ -301,7 +305,6 @@ void handleGame(Application *app, HAL *hal)
     {
         resetgameOver();
         app->printScreen = false;
-        MAP_Timer32_startTimer(TIMER32_0_BASE, true);
         drawGame();
         displayWord();
                    displayScore();
@@ -312,6 +315,7 @@ void handleGame(Application *app, HAL *hal)
         app->state = Results;
         app->printScreen = true;
     }
+
 
 }
 
@@ -476,6 +480,7 @@ void drawAccelData()
 //            Graphics_clearDisplay(&g_sContext);
 //           // end_game();
 //        }
+
 
      //   displayWord();
       //  displayScore();
