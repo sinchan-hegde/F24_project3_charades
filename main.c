@@ -210,6 +210,7 @@ void handleResults(Application *app, HAL *hal)
 
            end_game();
            app->printScreen = false;
+           score = 0;
     }
 
             if(JSBtapped()){
@@ -217,8 +218,8 @@ void handleResults(Application *app, HAL *hal)
                 app->printScreen = true;
                 (*app) = applicationConstruct();
                // initTimer();
-                MAP_Timer32_haltTimer(TIMER32_0_BASE);
-                MAP_Timer32_setCount(TIMER32_0_BASE, TIMER_COUNT_VALUE);
+             //   MAP_Timer32_haltTimer(TIMER32_0_BASE);
+               // MAP_Timer32_setCount(TIMER32_0_BASE, TIMER_COUNT_VALUE);
 
             }
 }
@@ -396,7 +397,7 @@ void displayWord()
         sprintf(word, " %s", words[word_index]);
         GrContextFontSet(&g_sContext, &g_sFontCmss24b);
 
-        Graphics_drawStringCentered(&g_sContext, "            ",
+        Graphics_drawStringCentered(&g_sContext, "                ",
              AUTO_STRING_LENGTH,
                                          65, 65, OPAQUE_TEXT);
         Graphics_drawStringCentered(&g_sContext, (int8_t*) word,
@@ -486,20 +487,20 @@ void drawAccelData()
         if (resultsBuffer[2] < 7000)
         {
            // Graphics_clearDisplay(&g_sContext);
-            next_word();
+           // next_word();
             my_state = DOWN;
-            displayWord();
-            displayScore();
+           // displayWord();
+           // displayScore();
 
 
         }
         else if (resultsBuffer[2] > 10500)
         {
           //  Graphics_clearDisplay(&g_sContext);
-            next_word();
+            //next_word();
             my_state = UP;
-            displayWord();
-            displayScore();
+           // displayWord();
+           // displayScore();
 
         }
         break;
@@ -508,13 +509,15 @@ void drawAccelData()
         if(waitToPrint == 0)
                 displayTimeRemaining();  // Display the remaining time      //  displayWord();
       //  displayScore();
-        if (resultsBuffer[2] > 7000)
+        if (resultsBuffer[2] > 7500)
         {
             score++;
 
             my_state = NORMAL;
-           // displayWord();
-           // displayScore();
+            next_word();
+
+           displayWord();
+           displayScore();
 
 
         }
@@ -527,8 +530,9 @@ void drawAccelData()
                 displayTimeRemaining();  // Display the remaining time
         if (resultsBuffer[2] < 10000)
         {
-           // displayWord();
-          //  displayScore();
+            next_word();
+            displayWord();
+           displayScore();
             my_state = NORMAL;
 
 
