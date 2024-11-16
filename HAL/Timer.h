@@ -9,6 +9,14 @@
 #define HAL_TIMER_H_
 
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
+//#define TIMER_COUNT_VALUE 2880000000
+#define TIMER_COUNT_VALUE 19200000
+
+int get_remaining_time();
+bool gameIsOver();
+void resetgameOver();
+void sleep();
+bool executeCode(void);
 
 #define MS_DIVISION_FACTOR 1000     // Number of milliseconds in one second
 #define US_DIVISION_FACTOR 1000000  // Number of microseconds in one second

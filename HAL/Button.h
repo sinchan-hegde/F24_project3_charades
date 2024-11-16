@@ -117,5 +117,6 @@ void Button_refresh(Button* button);
 bool LB1tapped();
 bool BB1tapped();
 bool BB2tapped();
+bool JSBtapped();
 
 #endif /* HAL_BUTTON_H_ */

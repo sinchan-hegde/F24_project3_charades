@@ -23,7 +23,6 @@ static volatile bool initialized = false;
 #define LCD_WIDTH 128    // LCD screen width for centering text
 #define TIMER_VALUE 60   //timer value is 60 seconds
 #define CLK_FRQ 48000000 //clock frequency
-#define TIMER_COUNT_VALUE 2880000000
 /* Buzzer GPIO Pin */
 #define BUZZER_PORT GPIO_PORT_P2
 #define BUZZER_PIN GPIO_PIN7
@@ -56,7 +55,9 @@ int main(void)
     while (1)
     {
         sleep();  // Low-power mode
-        applicationLoop(&app, &hal);
+
+                    applicationLoop(&app, &hal);
+
     }
 }
 
@@ -121,12 +122,7 @@ void initialize()
     MAP_Interrupt_enableInterrupt(INT_ADC14);
 
     /* Timer32 configuration */
-    MAP_Timer32_initModule(TIMER32_0_BASE, TIMER32_PRESCALER_1, TIMER32_32BIT,
-    TIMER32_PERIODIC_MODE);
-    MAP_Timer32_setCount(TIMER32_0_BASE, 2880000000); // 60-second timer (48 MHz)
-    MAP_Interrupt_enableInterrupt(INT_T32_INT1);
-    MAP_Timer32_enableInterrupt(TIMER32_0_BASE);
-    //MAP_Timer32_startTimer(TIMER32_0_BASE, true);
+initTimer();
 
 
     /* Start ADC conversion */
@@ -134,8 +130,9 @@ void initialize()
     MAP_ADC14_enableConversion();
     MAP_ADC14_toggleConversionTrigger();
 
-    MAP_Interrupt_enableMaster();
     initButtons();
+    MAP_Interrupt_enableMaster();
+
 }
 
 Application applicationConstruct()
@@ -144,6 +141,16 @@ Application applicationConstruct()
     app.state = Title;
     app.printScreen = true;
     return app;
+}
+
+void initTimer()
+{
+    MAP_Timer32_initModule(TIMER32_0_BASE, TIMER32_PRESCALER_1, TIMER32_32BIT,
+    TIMER32_PERIODIC_MODE);
+    MAP_Timer32_setCount(TIMER32_0_BASE, TIMER_COUNT_VALUE); // 60-second timer (48 MHz)
+    MAP_Interrupt_enableInterrupt(INT_T32_INT1);
+    MAP_Timer32_enableInterrupt(TIMER32_0_BASE);
+    MAP_Timer32_startTimer(TIMER32_0_BASE, true);
 }
 
 void applicationLoop(Application *app, HAL *hal)
@@ -166,12 +173,19 @@ void applicationLoop(Application *app, HAL *hal)
         handleGame(app, hal);
         break;
     }
-    case Results:  // New state to handle results screen
-            handleResults(app, hal);
-            break;
-    case Scores:
+    case Results:
     {
-        handleScores(app, hal);
+        handleResults(app, hal);
+            break;
+    }
+//    case Scores:
+//    {
+//        handleScores(app, hal);
+//        break;
+//    }
+    default:
+    {
+        handleTitle(app, hal);
         break;
     }
 
@@ -191,11 +205,20 @@ void handleScores(Application *app, HAL *hal)
 }
 void handleResults(Application *app, HAL *hal)
 {
-    MAP_Timer32_setCount(TIMER32_0_BASE, 480000000);
-            MAP_Timer32_startTimer(TIMER32_0_BASE, true);
-            if(get_remaining_time()==0){
+    if(app->printScreen)
+    {
+           end_game();
+           app->printScreen = false;
+    }
+
+            if(BB1tapped()){
                 app->state = Title;
                 app->printScreen = true;
+                (*app) = applicationConstruct();
+               // initTimer();
+                MAP_Timer32_haltTimer(TIMER32_0_BASE);
+                MAP_Timer32_setCount(TIMER32_0_BASE, TIMER_COUNT_VALUE);
+
             }
 }
 
@@ -239,8 +262,11 @@ void handleTitle(Application *app, HAL *hal)
 
     if (BB1tapped())
     {
+        MAP_Timer32_haltTimer(TIMER32_0_BASE);
+        MAP_Timer32_setCount(TIMER32_0_BASE, 2880000000); // 60-second timer (48 MHz)
         app->printScreen = true;
         app->state = Game;
+
     }
     if (BB2tapped())
     {
@@ -271,29 +297,29 @@ void handleGame(Application *app, HAL *hal)
 {
     if (app->printScreen)
     {
+        resetgameOver();
         app->printScreen = false;
         MAP_Timer32_startTimer(TIMER32_0_BASE, true);
         drawGame();
+        displayWord();
+                   displayScore();
     }
-    if (app->newRound)
-    {
-        Timer32_startTimer(TIMER32_0_BASE, true);
-
-    }
-
-    if (app->roundsPlayed < app->totalPlayers)
-    {
-
-    }
+//    if (app->newRound)
+//    {
+//        Timer32_startTimer(TIMER32_0_BASE, true);
+//
+//    }
+//
+//
+//    if (app->roundsPlayed < app->totalPlayers)
+//    {
+//
+//    }
 
     drawAccelData();
-    if(get_remaining_time()==0){
+    if(gameIsOver() || JSBtapped()){
         app->state = Results;
         app->printScreen = true;
-        end_game();
-
-
-
     }
 
 }
@@ -363,24 +389,43 @@ void drawGame()
     Graphics_drawStringCentered(&g_sContext, (int8_t*) "Charades:",
     AUTO_STRING_LENGTH,
                                 64, 30, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, "Time:   s",
+       AUTO_STRING_LENGTH,
+                                   30, 110, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, "Score: ",
+       AUTO_STRING_LENGTH,
+                                   40, 90, OPAQUE_TEXT);
+   /* Graphics_drawString(&g_sContext, "Word: ",
+       AUTO_STRING_LENGTH,
+                                   10, 50, OPAQUE_TEXT);*/
 }
 
 void displayWord()
 {
     char word[20];
-        sprintf(word, "word: %s", words[word_index]);
+        sprintf(word, " %s", words[word_index]);
+        GrContextFontSet(&g_sContext, &g_sFontCmss24b);
+
+        Graphics_drawStringCentered(&g_sContext, "            ",
+             AUTO_STRING_LENGTH,
+                                         65, 65, OPAQUE_TEXT);
         Graphics_drawStringCentered(&g_sContext, (int8_t*) word,
         AUTO_STRING_LENGTH,
-                                    64, 64, OPAQUE_TEXT);
+                                    65, 65, OPAQUE_TEXT);
+        GrContextFontSet(&g_sContext, &g_sFontFixed6x8);
+
 }
 
 void displayScore()
 {
     char scoreStr[10];
-    sprintf(scoreStr, "Score: %d", score);
-    Graphics_drawStringCentered(&g_sContext, (int8_t*) scoreStr,
+    sprintf(scoreStr, " %d", score);
+    Graphics_drawString(&g_sContext, "        ",
     AUTO_STRING_LENGTH,
-                                64, 90, OPAQUE_TEXT);
+                                75, 90, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, (int8_t*) scoreStr,
+    AUTO_STRING_LENGTH,
+                                75, 90, OPAQUE_TEXT);
 }
 
 void next_word()
@@ -396,24 +441,30 @@ int get_remaining_time()
 
 void end_game()
 {
-    char final_score[20];
+    char final_score[30];
     Graphics_clearDisplay(&g_sContext);
     sprintf(final_score, "Your final score: %d ", score);
     Graphics_drawStringCentered(&g_sContext, (int8_t*) final_score,
     AUTO_STRING_LENGTH,
-                                64, 90, OPAQUE_TEXT);
+                                64, 50, OPAQUE_TEXT);
+    Graphics_drawStringCentered(&g_sContext, "Press BB1 to return.",
+     AUTO_STRING_LENGTH,
+                                 64, 90, OPAQUE_TEXT);
 
 }
 
 void displayTimeRemaining()
 {
-    char timeStr[20];
+    char timeStr[10];
     uint32_t timer_value = MAP_Timer32_getValue(TIMER32_0_BASE);
     uint32_t remaining_time = timer_value / 48000000;
-    sprintf(timeStr, "Time: %d s", remaining_time);
-    Graphics_drawStringCentered(&g_sContext, (int8_t*) timeStr,
+    sprintf(timeStr, "%d", remaining_time);
+ /*   Graphics_drawStringCentered(&g_sContext, "  ",
     AUTO_STRING_LENGTH,
-                                64, 110, OPAQUE_TEXT);
+                                70, 110, OPAQUE_TEXT);*/
+    Graphics_drawString(&g_sContext, (int8_t*) timeStr,
+     AUTO_STRING_LENGTH,
+                                 64, 110, OPAQUE_TEXT);
 }
 
 void drawAccelData()
@@ -425,15 +476,15 @@ void drawAccelData()
         if (get_remaining_time() == 0)
         {
             Graphics_clearDisplay(&g_sContext);
-            end_game();
+           // end_game();
         }
 
-        displayWord();
-        displayScore();
+     //   displayWord();
+      //  displayScore();
         displayTimeRemaining();  // Display the remaining time
         if (resultsBuffer[2] < 7000)
         {
-            Graphics_clearDisplay(&g_sContext);
+           // Graphics_clearDisplay(&g_sContext);
             next_word();
             my_state = DOWN;
             displayWord();
@@ -443,7 +494,7 @@ void drawAccelData()
         }
         else if (resultsBuffer[2] > 10500)
         {
-            Graphics_clearDisplay(&g_sContext);
+          //  Graphics_clearDisplay(&g_sContext);
             next_word();
             my_state = UP;
             displayWord();
@@ -453,8 +504,8 @@ void drawAccelData()
         break;
     case DOWN:
         displayTimeRemaining();
-        displayWord();
-        displayScore();
+      //  displayWord();
+      //  displayScore();
         if (resultsBuffer[2] > 7000)
         {
             score++;
@@ -481,6 +532,8 @@ void drawAccelData()
         break;
     }
 }
+
+
 
 void ADC14_IRQHandler(void)
 {

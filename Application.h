@@ -59,7 +59,6 @@ void drawGame();
 void drawSettings();
 void end_game();
 void handleScores();
-int get_remaining_time();
-
+void initTimer();
 
 #endif

@@ -11,6 +11,7 @@
 /** The reference counter which tracks how many rollovers have occurred. Used in
  * timing SWTimers. */
 static volatile uint64_t hwTimerRollovers;
+volatile bool gameOver = false;
 
 /**
  * The ISR used to increment the total number of rollovers which have passed.
@@ -18,9 +19,41 @@ static volatile uint64_t hwTimerRollovers;
  * NOT DIRECTLY INVOKE THIS FUNCTION FROM YOUR CODE, or you WILL destroy the
  * accuracy of ALL software timers in your code.
  */
-void T32_INT1_IRQHandler() {
-  hwTimerRollovers++;
-  Timer32_clearInterruptFlag(TIMER32_0_BASE);
+bool executeCode(void)
+{
+    return(hwTimerRollovers % 1000 == 0);
+}
+
+void T32_INT1_IRQHandler(void) {
+    // Clear the interrupt flag
+    MAP_Timer32_clearInterruptFlag(TIMER32_0_BASE);
+    hwTimerRollovers++;
+
+    // Logic to handle when the timer expires
+    int remaining_time = get_remaining_time();
+    if (remaining_time <= 0) {
+        gameOver = true;
+        // Reset the timer for the next round
+        MAP_Timer32_haltTimer(TIMER32_0_BASE);
+        MAP_Timer32_setCount(TIMER32_0_BASE, TIMER_COUNT_VALUE);
+        MAP_Timer32_startTimer(TIMER32_0_BASE, true);
+    }
+    //sleep();
+}
+
+void resetgameOver()
+{
+    gameOver = false;
+}
+
+bool gameIsOver()
+{
+    if(gameOver)
+    {
+        gameOver = false;
+        return true;
+    }
+    return false;
 }
 
 /**

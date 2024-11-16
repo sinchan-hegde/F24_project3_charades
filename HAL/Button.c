@@ -225,9 +225,11 @@ bool BB2tapped()
     // the single output of the FMS
     bool tapped = false;
 
+bool b2mod = BB2modified;
+bool timerExpired = SWTimer_expired(&debounceTimer);
     // If we are in debouncing state and the debouncing timer is expired, in other
     // words, if wait time is over, we should leave the debouncing state.
-    if (debouncing && SWTimer_expired(&debounceTimer))
+    if (debouncing && timerExpired)
         debouncing = false;
 
     // if we are not in the debouncing state and a transition is detected
