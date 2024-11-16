@@ -12,7 +12,7 @@ Graphics_Context g_sContext;
 
 /* ADC results buffer */
 static uint16_t resultsBuffer[3];
-
+volatile uint8_t waitToPrint = 4;
 /* Words to display */
 static int word_index = 0;
 
@@ -207,11 +207,12 @@ void handleResults(Application *app, HAL *hal)
 {
     if(app->printScreen)
     {
+
            end_game();
            app->printScreen = false;
     }
 
-            if(BB1tapped()){
+            if(JSBtapped()){
                 app->state = Title;
                 app->printScreen = true;
                 (*app) = applicationConstruct();
@@ -304,17 +305,6 @@ void handleGame(Application *app, HAL *hal)
         displayWord();
                    displayScore();
     }
-//    if (app->newRound)
-//    {
-//        Timer32_startTimer(TIMER32_0_BASE, true);
-//
-//    }
-//
-//
-//    if (app->roundsPlayed < app->totalPlayers)
-//    {
-//
-//    }
 
     drawAccelData();
     if(gameIsOver() || JSBtapped()){
@@ -447,7 +437,7 @@ void end_game()
     Graphics_drawStringCentered(&g_sContext, (int8_t*) final_score,
     AUTO_STRING_LENGTH,
                                 64, 50, OPAQUE_TEXT);
-    Graphics_drawStringCentered(&g_sContext, "Press BB1 to return.",
+    Graphics_drawStringCentered(&g_sContext, "Press JSB to return.",
      AUTO_STRING_LENGTH,
                                  64, 90, OPAQUE_TEXT);
 
@@ -462,6 +452,13 @@ void displayTimeRemaining()
  /*   Graphics_drawStringCentered(&g_sContext, "  ",
     AUTO_STRING_LENGTH,
                                 70, 110, OPAQUE_TEXT);*/
+    if(remaining_time == 9)
+    {
+       Graphics_drawString(&g_sContext, "  ",
+      AUTO_STRING_LENGTH,
+                                  64, 110, OPAQUE_TEXT);
+    }
+
     Graphics_drawString(&g_sContext, (int8_t*) timeStr,
      AUTO_STRING_LENGTH,
                                  64, 110, OPAQUE_TEXT);
@@ -473,15 +470,19 @@ void drawAccelData()
     {
     case NORMAL:
         //MAP_Timer32_startTimer(TIMER32_0_BASE, true);
-        if (get_remaining_time() == 0)
-        {
-            Graphics_clearDisplay(&g_sContext);
-           // end_game();
-        }
+//        if (get_remaining_time() == 0)
+//        {
+//            Graphics_clearDisplay(&g_sContext);
+//           // end_game();
+//        }
 
      //   displayWord();
       //  displayScore();
+        waitToPrint = (waitToPrint + 1 % 5);
+
+        if(waitToPrint == 0)
         displayTimeRemaining();  // Display the remaining time
+
         if (resultsBuffer[2] < 7000)
         {
            // Graphics_clearDisplay(&g_sContext);
@@ -503,28 +504,31 @@ void drawAccelData()
         }
         break;
     case DOWN:
-        displayTimeRemaining();
-      //  displayWord();
+        waitToPrint = (waitToPrint + 1 % 5);
+        if(waitToPrint == 0)
+                displayTimeRemaining();  // Display the remaining time      //  displayWord();
       //  displayScore();
         if (resultsBuffer[2] > 7000)
         {
             score++;
 
             my_state = NORMAL;
-            displayWord();
-            displayScore();
+           // displayWord();
+           // displayScore();
 
 
         }
         // my_state = NORMAL;
         break;
     case UP:
+        waitToPrint = (waitToPrint + 1 % 5);
 
-        displayTimeRemaining();
+        if(waitToPrint == 0)
+                displayTimeRemaining();  // Display the remaining time
         if (resultsBuffer[2] < 10000)
         {
-            displayWord();
-            displayScore();
+           // displayWord();
+          //  displayScore();
             my_state = NORMAL;
 
 
