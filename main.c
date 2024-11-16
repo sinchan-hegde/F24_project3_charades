@@ -166,9 +166,6 @@ void applicationLoop(Application *app, HAL *hal)
         handleGame(app, hal);
         break;
     }
-    case Results:  // New state to handle results screen
-            handleResults(app, hal);
-            break;
     case Scores:
     {
         handleScores(app, hal);
@@ -188,15 +185,6 @@ void handleScores(Application *app, HAL *hal)
         Application app = applicationConstruct();
     }
 
-}
-void handleResults(Application *app, HAL *hal)
-{
-    MAP_Timer32_setCount(TIMER32_0_BASE, 480000000);
-            MAP_Timer32_startTimer(TIMER32_0_BASE, true);
-            if(get_remaining_time()==0){
-                app->state = Title;
-                app->printScreen = true;
-            }
 }
 
 //Converts int to string
@@ -262,8 +250,10 @@ void handleInstructions(Application *app, HAL *hal)
 
     if (BB2tapped())
     {
+        drawTitle();
         app->printScreen = true;
         app->state = Title;
+
     }
 }
 
@@ -272,7 +262,6 @@ void handleGame(Application *app, HAL *hal)
     if (app->printScreen)
     {
         app->printScreen = false;
-        MAP_Timer32_startTimer(TIMER32_0_BASE, true);
         drawGame();
     }
     if (app->newRound)
@@ -287,14 +276,7 @@ void handleGame(Application *app, HAL *hal)
     }
 
     drawAccelData();
-    if(get_remaining_time()==0){
-        app->state = Results;
-        app->printScreen = true;
-        end_game();
 
-
-
-    }
 
 }
 
@@ -421,7 +403,7 @@ void drawAccelData()
     switch (my_state)
     {
     case NORMAL:
-        //MAP_Timer32_startTimer(TIMER32_0_BASE, true);
+        MAP_Timer32_startTimer(TIMER32_0_BASE, true);
         if (get_remaining_time() == 0)
         {
             Graphics_clearDisplay(&g_sContext);
