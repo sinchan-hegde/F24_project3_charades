@@ -23,8 +23,8 @@ volatile static bool BB2modified;
 volatile static bool LB1modified;
 volatile static bool LB2modified;
 
-// 300 ms debouncing wait
-#define DEBOUNCE_WAIT 300
+// 500 ms debouncing wait
+#define DEBOUNCE_WAIT 500
 
 // An internal function that initializes a button and enables the high-to-low
 // transition

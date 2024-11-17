@@ -9,8 +9,8 @@
 #define HAL_TIMER_H_
 
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
-//#define TIMER_COUNT_VALUE 2880000000
-#define TIMER_COUNT_VALUE 19200000
+#define TIMER_COUNT_VALUE 2880000000
+//#define TIMER_COUNT_VALUE 19200000
 
 int get_remaining_time();
 bool gameIsOver();

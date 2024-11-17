@@ -55,8 +55,7 @@ int main(void)
     while (1)
     {
         sleep();  // Low-power mode
-
-                    applicationLoop(&app, &hal);
+        applicationLoop(&app, &hal);
 
     }
 }
@@ -140,6 +139,7 @@ Application applicationConstruct()
     Application app;
     app.state = Title;
     app.printScreen = true;
+    resetgameOver();
     return app;
 }
 
@@ -151,6 +151,7 @@ void initTimer()
     MAP_Interrupt_enableInterrupt(INT_T32_INT1);
     MAP_Timer32_enableInterrupt(TIMER32_0_BASE);
     MAP_Timer32_startTimer(TIMER32_0_BASE, true);
+
 }
 
 void applicationLoop(Application *app, HAL *hal)
@@ -192,18 +193,6 @@ void applicationLoop(Application *app, HAL *hal)
     }
 }
 
-void handleScores(Application *app, HAL *hal)
-{
-
-    if (BB1tapped())
-    {
-        app->printScreen = true;
-        app->state = Title;
-        Application app = applicationConstruct();
-    }
-
-}
-
 void handleResults(Application *app, HAL *hal)
 {
     if(app->printScreen)
@@ -212,12 +201,14 @@ void handleResults(Application *app, HAL *hal)
            end_game();
            app->printScreen = false;
            score = 0;
+           JSBtapped();
+           return;
     }
 
             if(JSBtapped()){
                 app->state = Title;
                 app->printScreen = true;
-                (*app) = applicationConstruct();
+                //(*app) = applicationConstruct();
                // initTimer();
              //   MAP_Timer32_haltTimer(TIMER32_0_BASE);
                // MAP_Timer32_setCount(TIMER32_0_BASE, TIMER_COUNT_VALUE);
@@ -262,12 +253,13 @@ void handleTitle(Application *app, HAL *hal)
     {
         app->printScreen = false;
         drawTitle();
+        BB1tapped(); //Handles issue with restarting game
+        BB2tapped();
+        return;
     }
 
     if (BB1tapped())
     {
-        MAP_Timer32_haltTimer(TIMER32_0_BASE);
-        MAP_Timer32_setCount(TIMER32_0_BASE, 2880000000); // 60-second timer (48 MHz)
         app->printScreen = true;
         app->state = Game;
 
@@ -305,15 +297,19 @@ void handleGame(Application *app, HAL *hal)
     {
         resetgameOver();
         app->printScreen = false;
+        MAP_Timer32_haltTimer(TIMER32_0_BASE);
+              MAP_Timer32_setCount(TIMER32_0_BASE, 2880000000); // 60-second timer (48 MHz)
+        MAP_Timer32_startTimer(TIMER32_0_BASE, true);
         drawGame();
         displayWord();
                    displayScore();
     }
 
     drawAccelData();
-    if(gameIsOver() || JSBtapped()){
+    if(gameIsOver() /*|| LB1tapped()*/){
         app->state = Results;
         app->printScreen = true;
+        resetgameOver();
     }
 
 

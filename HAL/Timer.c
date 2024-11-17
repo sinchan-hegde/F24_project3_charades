@@ -56,6 +56,11 @@ bool gameIsOver()
     return false;
 }
 
+void setgameOver()
+{
+    gameOver = true;
+}
+
 /**
  * Initializes the global system timing. This function should be called
  * immediately after the Watchdog timer is reset, so that the system clock is
